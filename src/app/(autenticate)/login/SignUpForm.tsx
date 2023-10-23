@@ -1,3 +1,5 @@
+
+"use client"
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { images } from "@/assets";
@@ -5,21 +7,23 @@ import Image from "next/image";
 import { toast } from "sonner";
 import { SignUpValues } from "./page";
 import { UseFormHandleSubmit, UseFormRegister } from "react-hook-form";
-
+import { useRouter } from "next/navigation";
 type props = {
   register: UseFormRegister<SignUpValues>;
   handleSubmit: UseFormHandleSubmit<SignUpValues, undefined>;
   reset: any;
 };
 export default function SignUpForm({ register, handleSubmit }: props) {
+  const router = useRouter();
   const onSubmit = async (data: SignUpValues) => {
     try {
-      const res = await fetch("http://localhost:3000/api/register", {
+      const res = await fetch("http://localhost:8080/api/v1/auth/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
+        credentials: "include",
       });
 
       const resData = await res.json();
@@ -34,6 +38,7 @@ export default function SignUpForm({ register, handleSubmit }: props) {
       }
 
       toast.success("Sign up successfully");
+      router.push("/dashboard");
     } catch (err) {
       toast.error("Sign up failed");
     }

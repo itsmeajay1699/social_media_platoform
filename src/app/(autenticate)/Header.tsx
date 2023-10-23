@@ -16,7 +16,7 @@ export default function Header({ pageState, setPageState }: HeaderProps) {
   const [themeState, setThemeState] = React.useState<boolean>();
 
   React.useEffect(() => {
-    if (theme === "dark") {
+    if (theme === "dark" || theme === "system") {
       setThemeState(true);
     } else {
       setThemeState(false);

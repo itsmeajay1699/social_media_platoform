@@ -1,3 +1,4 @@
+"use client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { images } from "@/assets";
@@ -6,6 +7,9 @@ import { toast } from "sonner";
 import { UseFormHandleSubmit, UseFormRegister } from "react-hook-form";
 import { z } from "zod";
 import { LoginValues } from "./page";
+import { redirect } from "next/navigation";
+
+import { useRouter } from "next/navigation";
 
 type props = {
   register: UseFormRegister<LoginValues>;
@@ -19,6 +23,7 @@ const loginSchema = z.object({
 });
 
 export default function LoginForm({ register, handleSubmit }: props) {
+  const router = useRouter();
   const onSubmit = async (data: LoginValues) => {
     try {
       const checkData = loginSchema.safeParse(data);
@@ -28,12 +33,13 @@ export default function LoginForm({ register, handleSubmit }: props) {
         return;
       }
 
-      const res = await fetch("http://localhost:3000/api/login", {
+      const res = await fetch("http://localhost:8080/api/v1/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
+        credentials: "include",
       });
 
       const response = await res.json();
@@ -42,8 +48,8 @@ export default function LoginForm({ register, handleSubmit }: props) {
         toast.error(response.message);
         return;
       }
-
       toast.success("Sign in successfully");
+      router.push("/dashboard");
     } catch (err) {
       console.log(err);
       toast.error("Sign in failed");
