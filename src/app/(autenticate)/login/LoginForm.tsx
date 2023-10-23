@@ -2,19 +2,79 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { images } from "@/assets";
 import Image from "next/image";
+import { toast } from "sonner";
+import { UseFormHandleSubmit, UseFormRegister } from "react-hook-form";
+import { z } from "zod";
+import { LoginValues } from "./page";
 
-export default function LoginForm() {
+type props = {
+  register: UseFormRegister<LoginValues>;
+  handleSubmit: UseFormHandleSubmit<LoginValues, undefined>;
+  reset: any;
+};
+
+const loginSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(8).max(16),
+});
+
+export default function LoginForm({ register, handleSubmit }: props) {
+  const onSubmit = async (data: LoginValues) => {
+    try {
+      const checkData = loginSchema.safeParse(data);
+
+      if (!checkData.success) {
+        toast.error("Invalid data");
+        return;
+      }
+
+      const res = await fetch("http://localhost:3000/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      const response = await res.json();
+
+      if (response?.error) {
+        toast.error(response.message);
+        return;
+      }
+
+      toast.success("Sign in successfully");
+    } catch (err) {
+      console.log(err);
+      toast.error("Sign in failed");
+    }
+  };
+
   return (
     <section className="w-96">
-      <form action="" className="w-96">
-        <Input type="email" placeholder="Email" className="bg-[#EAF0F7] py-6 text-black" />
+      <form onSubmit={handleSubmit(onSubmit)} className="w-96">
         <Input
+          type="email"
+          placeholder="Email"
+          className="bg-[#EAF0F7] py-6 text-black"
+          {...register("email", {
+            required: true,
+          })}
+        />
+        <Input
+          {...register("password", {
+            required: true,
+            minLength: 8,
+            maxLength: 16,
+          })}
           type="password"
           placeholder="Password"
           className="mt-4 bg-[#EAF0F7] py-6 text-black"
         />
         <h6 className="text-right mt-4">Recover password ?</h6>
-        <Button className="mt-4 w-full py-6">Sign in</Button>
+        <Button type="submit" className="mt-4 w-full py-6">
+          Sign in
+        </Button>
         <div className="relative flex py-5 items-center">
           <div className="flex-grow border-t border-black"></div>
           <span className="flex-shrink mx-4 text-black">or continue with</span>

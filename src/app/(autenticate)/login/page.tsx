@@ -7,12 +7,45 @@ import Image from "next/image";
 import LoginForm from "./LoginForm";
 import SignUpForm from "./SignUpForm";
 export type PageState = "Login" | "SignUp";
+import { Toaster } from "sonner";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+
+const loginSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(8).max(16),
+});
+
+const signUpSchema = z.object({
+  username: z.string(),
+  email: z.string().email(),
+  password: z.string().min(8).max(16),
+  confirmPassword: z.string().min(8).max(16),
+});
+
+export type LoginValues = z.infer<typeof loginSchema>;
+export type SignUpValues = z.infer<typeof signUpSchema>;
 
 export default function SignUpPage() {
   const [pageState, setPageState] = React.useState<PageState>("Login");
 
+  const loginForm = useForm<LoginValues>();
+  const signUpForm = useForm<SignUpValues>();
+
+  const {
+    register: loginRegister,
+    handleSubmit: loginHandleSubmit,
+    reset,
+  } = loginForm;
+
+  const {
+    register: signUpRegister,
+    handleSubmit: signUpHandleSubmit,
+  } = signUpForm;
+
   return (
     <main className="bg-login_bg">
+      <Toaster richColors position="top-right" />
       <div className="py-20 min-h-screen ">
         <div className="flex m-auto  justify-end max-w-5xl">
           <Header pageState={pageState} setPageState={setPageState} />
@@ -56,7 +89,19 @@ export default function SignUpPage() {
             />
           </div>
           <div className="m-auto">
-            {pageState === "Login" ? <LoginForm /> : <SignUpForm />}
+            {pageState === "Login" ? (
+              <LoginForm
+                reset={reset}
+                register={loginRegister}
+                handleSubmit={loginHandleSubmit}
+              />
+            ) : (
+              <SignUpForm
+                reset={reset}
+                register={signUpRegister}
+                handleSubmit={signUpHandleSubmit}
+              />
+            )}
           </div>
         </section>
       </div>
