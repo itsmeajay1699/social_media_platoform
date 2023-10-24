@@ -1,6 +1,27 @@
 import { Button } from "@/components/ui/button";
+import LogoutButton from "./LogoutButton";
+import { cookies } from "next/headers";
+import { revalidatePath } from "next/cache";
 
-export default function Sidebar() {
+export default async function Sidebar() {
+  const logout = async () => {
+    "use server";
+    try {
+      const res = await fetch("http://localhost:8080/api/v1/auth/logout");
+
+      if (res.status === 404) return null;
+      cookies()?.delete("token");
+      const data = await res.json();
+      if (data instanceof Error) {
+        console.log(data);
+      } else {
+        revalidatePath("/dashboard");
+      }
+    } catch (err) {
+      console.log(err);
+      return null;
+    }
+  };
   return (
     <div className="px-3 py-2">
       <h2 className="mb-2 px-4 text-lg font-semibold tracking-tight">Logo</h2>
@@ -71,23 +92,7 @@ export default function Sidebar() {
           </svg>
           Profile
         </Button>
-        <Button variant="ghost" className="w-full justify-start">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-            className="mr-2 h-4 w-4"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M11.25 9l-3 3m0 0l3 3m-3-3h7.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-          Logout
-        </Button>
+        <LogoutButton logout={logout} />
       </div>
     </div>
   );

@@ -9,16 +9,16 @@ export default function Topbar() {
           <div className="my-auto">
             <h1>Dashboard</h1>
           </div>
-          <div className="flex items-center bg bg-gray-100 shadow-sm pr-3 gap-2">
-            <Input className="bg-gray-100 rounded-md  md:w-96 w-60" />
-            <div className="cursor-pointer">
+          <div className="flex items-center bg shadow-sm pr-3 gap-2 border rounded-md">
+            <Input className="bg-secondary rounded-md  md:w-96 w-60 outline-none" />
+            <div className="cursor-pointer text-secondary hover:text-primary">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke-width="1.5"
                 stroke="currentColor"
-                className="w-6 h-6"
+                className="w-6 h-6 text-primary text-[10px] rounded-md"
               >
                 <path
                   stroke-linecap="round"
