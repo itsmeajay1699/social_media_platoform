@@ -41,7 +41,7 @@ export default async function TabComponent() {
         <Feed data={""} />
       </TabsContent>
       <TabsContent value="my-library">
-        <Feed data={""} />
+        <Feed data={""} upload={true} />
       </TabsContent>
     </Tabs>
   );

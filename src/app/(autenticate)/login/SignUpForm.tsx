@@ -1,5 +1,4 @@
-
-"use client"
+"use client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { images } from "@/assets";
@@ -27,6 +26,7 @@ export default function SignUpForm({ register, handleSubmit }: props) {
       });
 
       const resData = await res.json();
+      localStorage.setItem("token", resData.token);
 
       if (resData?.error) {
         toast.error(resData.message);

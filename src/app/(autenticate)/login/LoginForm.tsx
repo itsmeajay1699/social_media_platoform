@@ -44,6 +44,8 @@ export default function LoginForm({ register, handleSubmit }: props) {
 
       const response = await res.json();
 
+      localStorage.setItem("token", response.token);
+
       if (response?.error) {
         toast.error(response.message);
         return;
