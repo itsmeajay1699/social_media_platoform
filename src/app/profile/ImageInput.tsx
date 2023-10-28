@@ -4,17 +4,14 @@ import { Input } from "@/components/ui/input";
 import { set } from "zod";
 import Image from "next/image";
 
-export default function ImageInput({ field, url }: any) {
-  const [image, setImage] = React.useState<File | null>();
-  const [file, setFile] = React.useState("");
+export default function ImageInput({ field, url, setFile }: any) {
   const [preview, setPreview] = React.useState("");
   const onChangeHandler = (e: any) => {
     const file = e.target.files[0];
+    console.log(file)
     if (file) {
-      setImage(file);
-      setFile(URL.createObjectURL(file));
+      setFile(file);
       setPreview(URL.createObjectURL(file));
-
     }
   };
 
@@ -32,7 +29,6 @@ export default function ImageInput({ field, url }: any) {
             />
             <div
               onClick={() => {
-                setImage(null);
                 setFile("");
                 setPreview("");
               }}
@@ -78,7 +74,7 @@ export default function ImageInput({ field, url }: any) {
               id="fileInput"
               placeholder=""
               className="w-[120px] h-[120px] rounded-full mb-4  hidden"
-              {...field}
+              // {...field}
               onChange={onChangeHandler}
             />
           </div>
@@ -90,7 +86,7 @@ export default function ImageInput({ field, url }: any) {
             id="fileInput"
             placeholder=""
             className="w-[120px] h-[120px] rounded-full mb-4 flex"
-            {...field}
+            // {...field}
             onChange={onChangeHandler}
           />
         </>

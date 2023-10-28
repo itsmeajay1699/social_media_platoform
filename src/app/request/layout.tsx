@@ -9,12 +9,12 @@ export default function DashboardLayout({
 }) {
   return (
     <header className="">
-      <Topbar />
+      <Topbar input={false} />
       <main className="flex">
         <div className="max-w-[250px]">
           <Sidebar />
         </div>
-        <div className="max-w-[800px] w-full pr-6">{children}</div>
+        <div className=" w-full max-w-[800px] pr-6 mt-4">{children}</div>
       </main>
     </header>
   );

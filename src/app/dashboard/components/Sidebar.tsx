@@ -1,29 +1,35 @@
+"use client";
+
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+
 import { Button } from "@/components/ui/button";
 import LogoutButton from "./LogoutButton";
-import { cookies } from "next/headers";
+// import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-export default async function Sidebar() {
+export default function Sidebar() {
+  const router = useRouter();
   const logout = async () => {
-    "use server";
     try {
       const res = await fetch("http://localhost:8080/api/v1/auth/logout");
-      console.log(res);
       if (res.status === 404) return null;
-      cookies()?.delete("token");
+      localStorage.removeItem("token");
       const data = await res.json();
       console.log(data);
       if (data instanceof Error) {
       } else {
-        revalidatePath("/dashboard");
-        // redirect("/login");
+        // revalidatePath("/dashboard");
+        // redirect("/dashboard");
+        router.replace("/login");
       }
     } catch (err) {
       console.log(err);
       return null;
     }
   };
+
   return (
     <div className="px-3 py-2">
       <h2 className="mb-2 px-4 text-lg font-semibold tracking-tight">Logo</h2>
@@ -47,38 +53,42 @@ export default async function Sidebar() {
             Dashboard
           </Button>
         </Link>
-        <Button variant="ghost" className="w-full justify-start">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="mr-2 h-4 w-4"
-          >
-            <circle cx="8" cy="18" r="4" />
-            <path d="M12 18V2l7 4" />
-          </svg>
-          Friends
-        </Button>
-        <Button variant="ghost" className="w-full justify-start">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="mr-2 h-4 w-4"
-          >
-            <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
-            <circle cx="12" cy="7" r="4" />
-          </svg>
-          Followings
-        </Button>
+        <Link href={"/friend"}>
+          <Button variant="ghost" className="w-full justify-start">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="mr-2 h-4 w-4"
+            >
+              <circle cx="8" cy="18" r="4" />
+              <path d="M12 18V2l7 4" />
+            </svg>
+            Friends
+          </Button>
+        </Link>
+        <Link href={"/request"}>
+          <Button variant="ghost" className="w-full justify-start">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="mr-2 h-4 w-4"
+            >
+              <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+            Request
+          </Button>
+        </Link>
         <Link href={"/profile"}>
           <Button variant="ghost" className="w-full justify-start">
             <svg

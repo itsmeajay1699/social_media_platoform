@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { images } from "@/assets";
+import { useEdgeStore } from "@/lib/edgestore";
+import * as React from "react";
 import {
   Form,
   FormField,
@@ -15,7 +17,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { cn } from "@/lib/utils";
+import { Api, cn } from "@/lib/utils";
 import { z } from "zod";
 import { Toaster, toast } from "sonner";
 import ImageInput from "./ImageInput";
@@ -45,25 +47,65 @@ const profileFormSchema = z.object({
 type ProfileFormValues = z.infer<typeof profileFormSchema>;
 
 export default function ProfilePage() {
+  const { edgestore } = useEdgeStore();
+  const [file, setFile] = useState<File | null>(null);
+  const [user, setUser] = useState({} as any);
+
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
     // value coming from the server
     defaultValues: {
-      username: "",
-      email: "",
-      bio: "",
-      full_name: "",
-      phone_number: "",
-      profile_photo: "",
+      username: user.username,
+      email: user.email,
+      bio: user.bio,
+      full_name: user.full_name,
+      phone_number: user,
     },
   });
+
+  React.useEffect(() => {
+    const getUser = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const data = await Api(
+          "http://localhost:8080/api/v1/user/getUser",
+          token as string,
+          "GET"
+        );
+        setUser(data.user);
+
+        form.reset({
+          username: data.user.username || "",
+          email: data.user.email || "",
+          bio: data.user.bio || "",
+          full_name: data.user.full_name || "",
+          phone_number: data.user.phone_number || "",
+        });
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    getUser();
+  }, [form]);
 
   const [loading, setLoading] = useState(false);
 
   async function onSubmit(data: ProfileFormValues) {
     try {
       setLoading(true);
+      delete data.profile_photo; // remove the profile_photo from the data
       const token = localStorage.getItem("token");
+      console.log(token)
+      console.log(file)
+      if (file) {
+        const res = await edgestore.publicFiles.upload({
+          file,
+        });
+        data.profile_photo = res.url;
+      }
+
+      console.log(data);
+
       const res = await fetch("http://localhost:8080/api/v1/user/update", {
         method: "PATCH",
         body: JSON.stringify(data),
@@ -103,7 +145,11 @@ export default function ProfilePage() {
               <FormItem>
                 <FormLabel>Profile photo</FormLabel>
                 <FormControl>
-                  <ImageInput field={field} url={images.person} />
+                  <ImageInput
+                    field={field}
+                    url={user.profile_photo}
+                    setFile={setFile}
+                  />
                 </FormControl>
                 {/* <FormDescription>
                   This is account unique name that will be used to find you by
@@ -115,7 +161,7 @@ export default function ProfilePage() {
           />
           <FormField
             control={form.control}
-            name="full_name"
+            name="username"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Username</FormLabel>
@@ -132,7 +178,7 @@ export default function ProfilePage() {
           />
           <FormField
             control={form.control}
-            name="username"
+            name="full_name"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Full Name</FormLabel>

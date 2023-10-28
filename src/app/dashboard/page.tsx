@@ -11,19 +11,20 @@ import { Toaster } from "sonner";
 
 const checkUser = async () => {
   const myCookie = cookies()?.get("token")?.value;
+  console.log(myCookie)
   const res = await fetch("http://localhost:8080/api/v1/auth/check", {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${myCookie}`,
     },
-    credentials: "include",
   });
   return res;
 };
 
 export default async function DashboardPage() {
   const res = await checkUser();
+  console.log(res)
   if (res.status === 401) {
     redirect("/login");
   } else {

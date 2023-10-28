@@ -14,7 +14,7 @@ export default function DashboardLayout({
         <div className="max-w-[250px]">
           <Sidebar />
         </div>
-        <div className="max-w-[800px] w-full pr-6">{children}</div>
+        <div className="w-full pr-6">{children}</div>
       </main>
     </header>
   );
