@@ -82,7 +82,7 @@ export default function ProfilePage() {
           phone_number: data.user.phone_number || "",
         });
       } catch (err) {
-        console.log(err);
+        //(err);
       }
     };
     getUser();
@@ -95,16 +95,19 @@ export default function ProfilePage() {
       setLoading(true);
       delete data.profile_photo; // remove the profile_photo from the data
       const token = localStorage.getItem("token");
-      console.log(token)
-      console.log(file)
+      let resEdgeStore: any;
       if (file) {
-        const res = await edgestore.publicFiles.upload({
+        resEdgeStore = await edgestore.publicFiles.upload({
           file,
+          options: {
+            temporary: true,
+          },
         });
-        data.profile_photo = res.url;
+        data.profile_photo = resEdgeStore.url;
+        const deletePhoto = await edgestore.publicFiles.delete({
+          url: user.profile_photo,
+        });
       }
-
-      console.log(data);
 
       const res = await fetch("http://localhost:8080/api/v1/user/update", {
         method: "PATCH",
@@ -120,13 +123,16 @@ export default function ProfilePage() {
         return toast.error(response.message);
       }
       if (response) {
-        return toast.success(response.message);
+        //(resEdgeStore.url);
+        const confirm = await edgestore.publicFiles.confirmUpload({
+          url: resEdgeStore.url,
+        });
       }
 
       toast.success("Profile updated successfully");
     } catch (err) {
       toast.error("Something went wrong");
-      console.log(err);
+      //(err);
     } finally {
       setLoading(false);
     }

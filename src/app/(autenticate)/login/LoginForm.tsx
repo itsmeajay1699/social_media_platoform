@@ -45,6 +45,7 @@ export default function LoginForm({ register, handleSubmit }: props) {
       const response = await res.json();
 
       localStorage.setItem("token", response.token);
+      localStorage.setItem("user", response.user.id);
 
       if (response?.error) {
         toast.error(response.message);
@@ -53,7 +54,7 @@ export default function LoginForm({ register, handleSubmit }: props) {
       toast.success("Sign in successfully");
       router.push("/dashboard");
     } catch (err) {
-      console.log(err);
+      // //(err);
       toast.error("Sign in failed");
     }
   };

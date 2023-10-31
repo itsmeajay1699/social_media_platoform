@@ -36,7 +36,7 @@ export default async function TabComponent({
         </div>
       </TabsContent>
       <TabsContent value="send">
-        <div>
+        <div className="max-w-[800px] mx-auto">
           {sentRequest?.friendRequests?.length !== 0 ? (
             sentRequest?.friendRequests?.map((item: any) => (
               <RequestBox

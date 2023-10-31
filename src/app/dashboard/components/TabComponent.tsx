@@ -1,47 +1,79 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Feed from "./Feed";
-import Following from "./Following";
-import MyLibrary from "./MyLibrary";
+import dynamic from "next/dynamic";
+// import Following from "./Following";
 
-// const fetchPost1 = async () => {
-//   const res = await fetch("https://jsonplaceholder.typicode.com/posts/1");
-//   return res.json();
-// };
+const Following = dynamic(() => import("./Following"), { ssr: false });
 
-// const fetchPost2 = async () => {
-//   const res = await fetch("https://jsonplaceholder.typicode.com/posts/2");
-//   return res.json();
-// };
+const MyLibrary = dynamic(() => import("./MyLibrary"), { ssr: false });
 
-// const fetchPost3 = async () => {
-//   const res = await fetch("https://jsonplaceholder.typicode.com/posts/3");
-//   return res.json();
-// };
+import { Api } from "@/lib/utils";
+import { cookies } from "next/headers";
+// import { toast } from "sonner";
 
-export default async function TabComponent() {
-  //   const [post1, post2, post3] = await Promise.all([
-  //     fetchPost1(),
-  //     fetchPost2(),
-  //     fetchPost3(),
-  //   ]);
+const publicPostForFeedTabOne = async () => {
+  try {
+    if (!cookies()?.get("token")?.value) return new Error("Unauthorized");
+    const token = cookies()?.get("token")?.value;
 
+    const data = await Api(
+      "http://localhost:8080/api/v1/publicPost/",
+      token as string,
+      "GET",
+      null,
+      {
+        revalidating: 30,
+      }
+    );
+
+    return data;
+  } catch (err) {
+    //(err);
+  }
+};
+
+const friendsPostPost = async () => {
+  try {
+    if (!cookies()?.get("token")?.value) return new Error("Unauthorized");
+    const token = cookies()?.get("token")?.value;
+    const data = await Api(
+      "http://localhost:8080/api/v1/post/friend-post",
+      token as string,
+      "GET",
+      null,
+      {
+        revalidating: 30,
+      }
+    );
+
+    return data;
+  } catch (err) {
+    //(err);
+  }
+};
+
+export default async function TabComponent({ user_id }: { user_id: number }) {
+  const dataForFeedTabOne = await publicPostForFeedTabOne();
+  const dataForFeedTabTwo = await friendsPostPost();
+  // //(dataForFeedTabTwo);
+  // //(dataForFeedTabOne);
   return (
     <Tabs defaultValue="feed" className="w-full">
       <div className="text-right">
         <TabsList className="w-fit">
           <TabsTrigger value="feed">Feed</TabsTrigger>
-          <TabsTrigger value="following">Following</TabsTrigger>
+          <TabsTrigger value="friends">Following</TabsTrigger>
           <TabsTrigger value="my-library">My library</TabsTrigger>
         </TabsList>
       </div>
       <TabsContent value="feed">
-        <Feed data={""} />
+        <Feed user_id={user_id} data={dataForFeedTabOne} />
       </TabsContent>
-      <TabsContent value="following">
-        <Feed data={""} />
+      <TabsContent value="friends">
+        <Following user_id={user_id} data={dataForFeedTabTwo} />
       </TabsContent>
       <TabsContent value="my-library">
-        <Feed data={""} upload={true} />
+        <MyLibrary user_id={user_id} />
       </TabsContent>
     </Tabs>
   );

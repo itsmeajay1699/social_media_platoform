@@ -13,11 +13,13 @@ export default function Sidebar() {
   const router = useRouter();
   const logout = async () => {
     try {
-      const res = await fetch("http://localhost:8080/api/v1/auth/logout");
+      const res = await fetch("http://localhost:8080/api/v1/auth/logout", {
+        credentials: "include",
+      });
       if (res.status === 404) return null;
       localStorage.removeItem("token");
       const data = await res.json();
-      console.log(data);
+      //(data);
       if (data instanceof Error) {
       } else {
         // revalidatePath("/dashboard");
@@ -25,7 +27,7 @@ export default function Sidebar() {
         router.replace("/login");
       }
     } catch (err) {
-      console.log(err);
+      //(err);
       return null;
     }
   };

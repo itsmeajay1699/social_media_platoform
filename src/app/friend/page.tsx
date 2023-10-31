@@ -27,13 +27,14 @@ const getFriends = async () => {
       }
     }
   } catch (err) {
-    console.log(err);
+    //(err);
   }
 };
 
 export default async function Friends() {
   const data = await getFriends();
-  console.log(data);
+  
+  // console.log(data)
 
   return (
     <>

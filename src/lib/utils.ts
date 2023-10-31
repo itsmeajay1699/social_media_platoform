@@ -6,16 +6,30 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 
-export const Api = async(url:string,token?:string,method?:string) =>{
-    
-  const response = await fetch(url, {
-    method: method,
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    }
-  })
-  const data = await response.json()
-  return data
+export const Api = async (url:string, token:string, method = 'GET', body = null,next?:any) => {
+  const headers = {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`
+  };
 
-}
+  const requestOptions = {
+    method,
+    headers,
+  };
+
+  if (method !== 'GET' && body) {
+    requestOptions.body = JSON.stringify(body);
+  }
+
+  if(next){
+    requestOptions.next = next;
+  }
+  
+  //(requestOptions)
+ 
+  const response = await fetch(url, requestOptions);
+
+  const responseData = await response.json();
+  
+  return responseData;
+}; 

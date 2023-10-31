@@ -9,27 +9,45 @@ import { images } from "@/assets";
 import TabComponent from "./components/TabComponent";
 import { Toaster } from "sonner";
 
-const checkUser = async () => {
-  const myCookie = cookies()?.get("token")?.value;
-  console.log(myCookie)
-  const res = await fetch("http://localhost:8080/api/v1/auth/check", {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${myCookie}`,
-    },
-  });
-  return res;
+const getFriends = async () => {
+  try {
+    const res = await fetch(
+      "http://localhost:8080/api/v1/relation//friend-request/accepted",
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${cookies()?.get("token")?.value}`,
+        },
+        cache: "no-store",
+      }
+    );
+
+    if (res.status === 200) {
+      const data = await res.json();
+      if (data.error) {
+        // toast.error(data.message);
+      } else {
+        // toast.success(data.message);
+        return data;
+      }
+    }
+  } catch (err) {
+    //(err);
+  }
 };
 
 export default async function DashboardPage() {
-  const res = await checkUser();
-  console.log(res)
-  if (res.status === 401) {
-    redirect("/login");
-  } else {
-    const data = await res.json();
-  }
+  // const res = await checkUser();
+  // //(res.user.id);
+  // if (res.status === 401) {
+  //   redirect("/login");
+  // } else {
+  //   //(res.user.id);
+  // }
+
+  const friends = await getFriends();
+  console.log(friends.friends)
 
   return (
     <>
@@ -50,30 +68,11 @@ export default async function DashboardPage() {
             ))}
           </div>
           <section className="mt-4">
-            <TabComponent />
+            <TabComponent user_id={2} />
           </section>
         </div>
         <div className="p-4 h-[700px] overflow-x-auto hidden xl:block">
-          <FriendsComponentCard>
-            <section className="mt-4 flex flex-col gap-4">
-              <h1 className="text-2xl">Friends</h1>
-              {Array.from({ length: 20 - 1 }).map(() => (
-                <div
-                  key={Math.random()}
-                  className="bg-white rounded-md shadow-md flex justify-between items-center px-4 py-2"
-                >
-                  <Image
-                    src={images.fb}
-                    width={30}
-                    height={30}
-                    alt="avatar"
-                    className="rounded-[50%] object-cover"
-                  />
-                  <h6 className="text-secondary">Ajay kumar</h6>
-                </div>
-              ))}
-            </section>
-          </FriendsComponentCard>
+          <FriendsComponentCard data={friends?.friends} />
         </div>
       </main>
     </>

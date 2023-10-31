@@ -23,7 +23,7 @@ const RecievedReques = async (url: string, myCookie: any) => {
       return data;
     }
   } catch (err) {
-    console.log(err);
+    //(err);
   }
 };
 export default async function RequestPage() {
@@ -32,12 +32,12 @@ export default async function RequestPage() {
     "http://localhost:8080/api/v1/relation/friend-request/received",
     myCookie
   );
-  console.log(recievedRequest);
+  // //(recievedRequest);
   const sentRequest = await RecievedReques(
     "http://localhost:8080/api/v1/relation/friend-request/sent",
     myCookie
   );
-  console.log(sentRequest);
+  // //(sentRequest);
   return (
     <>
       <Toaster richColors />

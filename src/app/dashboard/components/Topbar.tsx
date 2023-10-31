@@ -4,24 +4,28 @@ import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import React from "react";
 import { toast } from "sonner";
-import { images } from "@/assets";
+import { useRouter } from "next/navigation";
+import { Api } from "@/lib/utils";
 export default function Topbar({ input = true }: { input?: boolean }) {
   const [search, setSearch] = React.useState<string>("");
   const [loading, setLoading] = React.useState<boolean>(false);
   const [users, setUsers] = React.useState<any[]>([]);
+  const [accountUser, setAccountUser] = React.useState<any>(null);
   const [show, setShow] = React.useState<boolean>(true);
   React.useEffect(() => {
     try {
+      const token = localStorage.getItem("token");
       setLoading(true);
       if (search.length === 0) {
         setShow(false);
       }
+
       if (search.length < 1 || search.length > 10) {
         setUsers([]);
         return;
       }
       const fetchUsers = async () => {
-        const token = localStorage.getItem("token");
+        //(token);
         const res = await fetch(
           `http://localhost:8080/api/v1/user/getUsers/${search}`,
           {
@@ -32,6 +36,7 @@ export default function Topbar({ input = true }: { input?: boolean }) {
             },
           }
         );
+
         let data;
         if (res.status === 200) {
           data = await res.json();
@@ -43,11 +48,25 @@ export default function Topbar({ input = true }: { input?: boolean }) {
 
       fetchUsers();
     } catch (err) {
-      console.log(err);
+      //(err);
     } finally {
       setLoading(false);
     }
   }, [search]);
+
+  React.useEffect(() => {
+    const token = localStorage.getItem("token");
+    const user = async () => {
+      const localUser = await Api(
+        "http://localhost:8080/api/v1/user/me",
+        token as string
+      );
+      //(localUser.user);
+      setAccountUser(localUser.user);
+    };
+    user();
+  }, []);
+
   const [id, setId] = React.useState<number[]>([]);
   const handleAddFriend = async (id: number) => {
     try {
@@ -75,11 +94,13 @@ export default function Topbar({ input = true }: { input?: boolean }) {
       }
       toast.success("Friend request sent");
     } catch (err) {
-      console.log(err);
+      //(err);
     } finally {
       setId((prev) => prev.filter((item) => item !== id));
     }
   };
+
+  const router = useRouter();
 
   return (
     <header className="max-w-screen-xl m-auto mt-5">
@@ -108,7 +129,7 @@ export default function Topbar({ input = true }: { input?: boolean }) {
                       >
                         <div className="flex items-center gap-3">
                           <Avatar>
-                            <AvatarImage src={user.profile_photo} />
+                            <AvatarImage src={user?.profile_photo} />
                             <AvatarFallback className="text-xs">
                               {"photo"}
                             </AvatarFallback>
@@ -205,9 +226,20 @@ export default function Topbar({ input = true }: { input?: boolean }) {
             </div>
           )}
         </div>
-        <div className="hidden md:block">
+        <div
+          onClick={() => {
+            router.push("/profile");
+          }}
+          className="hidden md:flex items-center gap-3 cursor-pointer"
+        >
+          <h3 className="text-primary text-sm ">
+            Hi{" "}
+            <span className="font-semibold cursor-pointer">
+              {accountUser?.full_name || accountUser?.username}{" "}
+            </span>
+          </h3>
           <Avatar>
-            <AvatarImage src="https://github.com/shadcn.png" />
+            <AvatarImage src={accountUser?.profile_photo} />
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
         </div>

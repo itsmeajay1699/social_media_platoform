@@ -8,7 +8,7 @@ export default function ImageInput({ field, url, setFile }: any) {
   const [preview, setPreview] = React.useState("");
   const onChangeHandler = (e: any) => {
     const file = e.target.files[0];
-    console.log(file)
+    //(file)
     if (file) {
       setFile(file);
       setPreview(URL.createObjectURL(file));
@@ -50,7 +50,7 @@ export default function ImageInput({ field, url, setFile }: any) {
             </div>
             <div
               onClick={() => {
-                console.log("clicked");
+                //("clicked");
                 document?.getElementById("fileInput")?.click();
               }}
             >
