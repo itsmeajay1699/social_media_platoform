@@ -9,10 +9,10 @@ const UploadPostComponent = dynamic(
 
 export default function Following({
   data,
-  user_id,
+  // user_id,
 }: {
   data: any;
-  user_id: number;
+  // user_id: number;
   upload?: boolean;
 }) {
   return (
@@ -30,7 +30,7 @@ export default function Following({
                 ? friendPost.sender.posts.map((post: any) => (
                     <PostCard
                       key={post.post_id}
-                      user_id={user_id}
+                      // user_id={user_id}
                       post_id={post.post_id}
                       media={post.media}
                       likeCount={post.likes_count}
@@ -43,7 +43,7 @@ export default function Following({
                   ))
                 : friendPost.receiver.posts.map((post: any) => (
                     <PostCard
-                      user_id={user_id}
+                      // user_id={user_id}
                       post_id={post.post_id}
                       key={post.post_id}
                       media={post.media}

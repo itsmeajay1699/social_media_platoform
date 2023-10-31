@@ -22,7 +22,8 @@ const myPost = async () => {
   }
 };
 
-export default async function MyLibrary({ user_id }: { user_id: number }) {
+export default async function MyLibrary() {
+  // { user_id }: { user_id: number }
   const my_post = await myPost();
 
   return (
@@ -35,7 +36,7 @@ export default async function MyLibrary({ user_id }: { user_id: number }) {
           //(post?.post?.user?.username);
           return (
             <PostCard
-              user_id={user_id}
+              // user_id={user_id}
               key={Math.random()}
               post_id={post?.post_id}
               media={post?.media}

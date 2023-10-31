@@ -16,8 +16,8 @@ export default function PostCard({
   post_id,
   myContent = false,
   likeUser,
-  user_id,
-}: {
+}: // user_id,
+{
   key: number;
   media: string;
   likeCount: number;
@@ -26,11 +26,12 @@ export default function PostCard({
   about: string;
   user_photo: string;
   post_id: number;
-  user_id: number;
+  // user_id: number;
   likeUser?: number[];
   myContent?: boolean;
 }) {
   const router = useRouter();
+  const user_id = parseInt(localStorage.getItem("user") as string);
   const likeButton = async (id: number) => {
     try {
       const res = await Api(
@@ -50,7 +51,6 @@ export default function PostCard({
   return (
     <div className="p-2 mb-4" key={key}>
       <div className="max-w-sm rounded overflow-hidden shadow-lg relative">
-        
         <div className="w-full h-[250px]">
           <Image
             src={media}

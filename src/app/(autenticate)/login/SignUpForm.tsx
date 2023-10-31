@@ -35,6 +35,7 @@ export default function SignUpForm({ register, handleSubmit }: props) {
 
       if (resData?.token) {
         localStorage.setItem("token", resData.token);
+        localStorage.setItem("user", resData.user.id);
       }
 
       toast.success("Sign up successfully");

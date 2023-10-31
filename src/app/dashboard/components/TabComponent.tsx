@@ -67,13 +67,21 @@ export default async function TabComponent({ user_id }: { user_id: number }) {
         </TabsList>
       </div>
       <TabsContent value="feed">
-        <Feed user_id={user_id} data={dataForFeedTabOne} />
+        <Feed
+          // user_id={user_id}
+          data={dataForFeedTabOne}
+        />
       </TabsContent>
       <TabsContent value="friends">
-        <Following user_id={user_id} data={dataForFeedTabTwo} />
+        <Following
+          // user_id={user_id}
+          data={dataForFeedTabTwo}
+        />
       </TabsContent>
       <TabsContent value="my-library">
-        <MyLibrary user_id={user_id} />
+        <MyLibrary
+        // user_id={user_id}
+        />
       </TabsContent>
     </Tabs>
   );

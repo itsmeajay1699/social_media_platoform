@@ -5,10 +5,10 @@ import dynamic from "next/dynamic";
 export default function Feed({
   data,
   upload,
-  user_id,
-}: {
+}: // user_id,s
+{
   data: any;
-  user_id: number;
+  // user_id: number;
   upload?: boolean;
 }) {
   return (
@@ -27,7 +27,7 @@ export default function Feed({
               user_photo={post?.post?.user?.profile_photo}
               post_id={post?.post?.post_id}
               likeUser={post?.post?.like_user_id}
-              user_id={user_id}
+              // user_id={user_id}
             />
           );
         })}

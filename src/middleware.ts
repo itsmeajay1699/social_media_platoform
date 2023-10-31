@@ -10,13 +10,14 @@ export async function middleware(request: NextRequest) {
     // console.log(myCookie);
 
     if (!myCookie) {
-      console.log("hello world")
+      console.log("hello world");
       return NextResponse.redirect(new URL("/login", request.url));
     }
 
     const currentPath: loginUser = request.nextUrl.pathname as loginUser;
     console.log(currentPath);
     if (currentPath === "/login" || currentPath === "/signup") {
+      console.log("hello world");
       if (myCookie) {
         return NextResponse.redirect(new URL("/dashboard", request.url));
       }
@@ -71,7 +72,7 @@ export const config = {
     "/request",
     "/friend",
     "/profile",
-    // "/login",
-    // "/signup",
+    "/login",
+    "/signup",
   ],
 };
