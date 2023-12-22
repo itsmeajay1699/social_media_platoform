@@ -37,7 +37,7 @@ export default function RequestBoxCard({
   ) => {
     if (prevstatus !== 0) return toast.error("You can't accept this request");
     try {
-      const res = await fetch(`http://localhost:3000/api/request`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_FRONTEND_API_PROD}/api/request`, {
         method: "PATCH",
         body: JSON.stringify({
           status,
