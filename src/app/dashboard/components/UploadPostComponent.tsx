@@ -97,7 +97,7 @@ const UploadPostForm = ({
       }
 
       const res = await Api(
-        "http://localhost:8080/api/v1/post",
+        `${process.env.NEXT_PUBLIC_BACKEND_API_PROD}/api/v1/post`,
         token as string,
         "POST",
         data

@@ -33,14 +33,17 @@ export default function LoginForm({ register, handleSubmit }: props) {
         return;
       }
 
-      const res = await fetch("http://localhost:8080/api/v1/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-        credentials: "include",
-      });
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_API_PROD}/api/v1/auth/login`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+          credentials: "include",
+        }
+      );
 
       const response = await res.json();
 

@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 export async function PATCH(req: NextRequest) {
   const data = await req.json();
   const myCookie = cookies()?.get("token")?.value;
-  const res = await fetch("http://localhost:8080/api/v1/relation/update", {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_PROD}/api/v1/relation/update`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",

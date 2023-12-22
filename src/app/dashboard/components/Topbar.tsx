@@ -27,7 +27,7 @@ export default function Topbar({ input = true }: { input?: boolean }) {
       const fetchUsers = async () => {
         //(token);
         const res = await fetch(
-          `http://localhost:8080/api/v1/user/getUsers/${search}`,
+          `${process.env.NEXT_PUBLIC_BACKEND_API_PROD}/api/v1/user/getUsers/${search}`,
           {
             method: "GET",
             headers: {
@@ -58,7 +58,7 @@ export default function Topbar({ input = true }: { input?: boolean }) {
     const token = localStorage.getItem("token");
     const user = async () => {
       const localUser = await Api(
-        "http://localhost:8080/api/v1/user/me",
+        `${process.env.NEXT_PUBLIC_BACKEND_API_PROD}/api/v1/user/me`,
         token as string
       );
       //(localUser.user);
@@ -72,7 +72,7 @@ export default function Topbar({ input = true }: { input?: boolean }) {
     try {
       const token = localStorage.getItem("token");
       const res = await fetch(
-        `http://localhost:8080/api/v1/relation/friend-request`,
+        `${process.env.NEXT_PUBLIC_BACKEND_API_PROD}/api/v1/relation/friend-request`,
         {
           method: "POST",
           headers: {
@@ -82,10 +82,12 @@ export default function Topbar({ input = true }: { input?: boolean }) {
           body: JSON.stringify({
             receiver_id: id,
           }),
+          cache: "no-store",
         }
       );
       if (res.status === 200) {
         const data = await res.json();
+        console.log(data);
         if (data.error) {
           toast.error(data.message);
 
@@ -240,7 +242,7 @@ export default function Topbar({ input = true }: { input?: boolean }) {
           </h3>
           <Avatar>
             <AvatarImage src={accountUser?.profile_photo} />
-            <AvatarFallback>CN</AvatarFallback>
+            <AvatarFallback>profile_photo</AvatarFallback>
           </Avatar>
         </div>
         <div className="md:hidden block">

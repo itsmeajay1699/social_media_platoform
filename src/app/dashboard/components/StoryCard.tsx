@@ -1,11 +1,12 @@
 import Image from "next/image";
 import { images } from "@/assets";
-export default function StoryCard() {
+export default function StoryCard({ story }: { story: any }) {
+  console.log(story);
   return (
     <div className="bg-white rounded-md w-[150px]">
       <div className="relative">
         <Image
-          src={images.person}
+          src={story.media_url}
           width={150}
           height={150}
           alt="avatar"
@@ -14,14 +15,16 @@ export default function StoryCard() {
         <div className="absolute bottom-2  flex items-center w-full justify-between px-4">
           <div className="">
             <Image
-              src={images.google}
+              src={story.story_user.profile_photo}
               width={20}
               height={20}
               alt="plus"
               className="rounded-full"
             />
           </div>
-          <span className="text-secondary text-lg">Ajay</span>
+          <span className="text-black text-lg">
+            {story.story_user.username}
+          </span>
         </div>
       </div>
     </div>

@@ -26,7 +26,7 @@ export default function DropDownMenu({
       setLoading(true);
       const token = localStorage.getItem("token");
       const res = await Api(
-        `http://localhost:8080/api/v1/post/${id}`,
+        `${process.env.NEXT_PUBLIC_BACKEND_API_PROD}/api/v1/post/${id}`,
         token as string,
         "DELETE"
       );

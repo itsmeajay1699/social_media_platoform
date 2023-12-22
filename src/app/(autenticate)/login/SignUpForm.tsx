@@ -16,7 +16,7 @@ export default function SignUpForm({ register, handleSubmit }: props) {
   const router = useRouter();
   const onSubmit = async (data: SignUpValues) => {
     try {
-      const res = await fetch("http://localhost:8080/api/v1/auth/register", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_PROD}/api/v1/auth/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

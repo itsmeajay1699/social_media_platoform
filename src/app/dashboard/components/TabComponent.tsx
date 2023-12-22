@@ -17,7 +17,7 @@ const publicPostForFeedTabOne = async () => {
     const token = cookies()?.get("token")?.value;
 
     const data = await Api(
-      "http://localhost:8080/api/v1/publicPost/",
+      `${process.env.NEXT_PUBLIC_BACKEND_API_PROD}/api/v1/publicPost/`,
       token as string,
       "GET",
       null,
@@ -37,7 +37,7 @@ const friendsPostPost = async () => {
     if (!cookies()?.get("token")?.value) return new Error("Unauthorized");
     const token = cookies()?.get("token")?.value;
     const data = await Api(
-      "http://localhost:8080/api/v1/post/friend-post",
+      `${process.env.NEXT_PUBLIC_BACKEND_API_PROD}/api/v1/post/friend-post`,
       token as string,
       "GET",
       null,

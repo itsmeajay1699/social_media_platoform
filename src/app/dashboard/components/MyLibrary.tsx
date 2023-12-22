@@ -7,8 +7,9 @@ const myPost = async () => {
   try {
     if (!cookies()?.get("token")?.value) return new Error("Unauthorized");
     const token = cookies()?.get("token")?.value;
+    console.log(token)
     const res = Api(
-      "http://localhost:8080/api/v1/post/my-post",
+      `${process.env.NEXT_PUBLIC_BACKEND_API_PROD}/api/v1/post/my-post`,
       token as string,
       "GET",
       null,

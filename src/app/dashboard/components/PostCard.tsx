@@ -35,7 +35,7 @@ export default function PostCard({
   const likeButton = async (id: number) => {
     try {
       const res = await Api(
-        `http://localhost:8080/api/v1/post/like/${id}`,
+        `${process.env.NEXT_PUBLIC_BACKEND_API_PROD}/api/v1/post/like/${id}`,
         localStorage.getItem("token") as string,
         "POST"
       );
@@ -50,25 +50,25 @@ export default function PostCard({
 
   return (
     <div className="p-2 mb-4" key={key}>
-      <div className="max-w-sm rounded overflow-hidden shadow-lg relative">
-        <div className="w-full h-[250px]">
+      <div className="max-w-sm rounded overflow-hidden shadow-lg relative h-[300px]">
+        <div className="h-[200px]">
           <Image
             src={media}
             alt="Mountain"
             className="w-full h-full object-cover"
-            width={300}
-            height={300}
+            width={200}
+            height={200}
           />
         </div>
 
-        <div className="mt-2 flex justify-between items-center">
+        <div className="mt-2 flex justify-between items-center px-2">
           <div className="flex gap-4 items-center">
             <Image
               src={user_photo}
               width={30}
               height={30}
               alt="avatar"
-              className="rounded-[50%] object-cover"
+              className="rounded-full object-cover h-[40px] w-[40px]"
             />
             <span className="text-primary">{username}</span>
           </div>
@@ -124,8 +124,8 @@ export default function PostCard({
             </svg>
           </div>
         </div>
-        <div className="mt-2">
-          <span className="text-sm line-clamp-3">{about}</span>
+        <div className="mt-2 px-2">
+          <span className="text-sm line-clamp-3 font-medium">{about}</span>
         </div>
         {myContent && (
           <div>

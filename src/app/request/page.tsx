@@ -29,12 +29,12 @@ const RecievedReques = async (url: string, myCookie: any) => {
 export default async function RequestPage() {
   const myCookie = cookies()?.get("token")?.value;
   const recievedRequest = await RecievedReques(
-    "http://localhost:8080/api/v1/relation/friend-request/received",
+    `${process.env.NEXT_PUBLIC_BACKEND_API_PROD}/api/v1/relation/friend-request/received`,
     myCookie
   );
   // //(recievedRequest);
   const sentRequest = await RecievedReques(
-    "http://localhost:8080/api/v1/relation/friend-request/sent",
+    `${process.env.NEXT_PUBLIC_BACKEND_API_PROD}/api/v1/relation/friend-request/sent`,
     myCookie
   );
   // //(sentRequest);

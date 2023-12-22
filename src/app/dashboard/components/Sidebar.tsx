@@ -13,7 +13,7 @@ export default function Sidebar() {
   const router = useRouter();
   const logout = async () => {
     try {
-      const res = await fetch("http://localhost:8080/api/v1/auth/logout", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_PROD}/api/v1/auth/logout`, {
         credentials: "include",
       });
       if (res.status === 404) return null;

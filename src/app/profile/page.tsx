@@ -48,6 +48,7 @@ type ProfileFormValues = z.infer<typeof profileFormSchema>;
 
 export default function ProfilePage() {
   const { edgestore } = useEdgeStore();
+  const [refresh, setRefresh] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [user, setUser] = useState({} as any);
 
@@ -68,7 +69,7 @@ export default function ProfilePage() {
       try {
         const token = localStorage.getItem("token");
         const data = await Api(
-          "http://localhost:8080/api/v1/user/getUser",
+          `${process.env.NEXT_PUBLIC_BACKEND_API_PROD}/api/v1/user/getUser`,
           token as string,
           "GET"
         );
@@ -86,7 +87,7 @@ export default function ProfilePage() {
       }
     };
     getUser();
-  }, [form]);
+  }, [form, refresh]);
 
   const [loading, setLoading] = useState(false);
 
@@ -104,12 +105,15 @@ export default function ProfilePage() {
           },
         });
         data.profile_photo = resEdgeStore.url;
-        const deletePhoto = await edgestore.publicFiles.delete({
-          url: user.profile_photo,
-        });
+        const checkPhoto = "https://i.imgur.com/6VBx3io.png";
+        if (user.profile_photo !== checkPhoto) {
+          const deletePhoto = await edgestore.publicFiles.delete({
+            url: user.profile_photo,
+          });
+        }
       }
 
-      const res = await fetch("http://localhost:8080/api/v1/user/update", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_PROD}/api/v1/user/update`, {
         method: "PATCH",
         body: JSON.stringify(data),
         headers: {
@@ -122,14 +126,16 @@ export default function ProfilePage() {
       if (response.error) {
         return toast.error(response.message);
       }
-      if (response) {
-        //(resEdgeStore.url);
+
+      if (response && file) {
+        // console.log(resEdgeStore.url);
         const confirm = await edgestore.publicFiles.confirmUpload({
           url: resEdgeStore.url,
         });
       }
 
       toast.success("Profile updated successfully");
+      setRefresh(!refresh);
     } catch (err) {
       toast.error("Something went wrong");
       //(err);
