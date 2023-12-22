@@ -25,7 +25,7 @@ export default function ChatSections({ data }: { data: any }) {
 
   // console.log(user_id)
   useEffect(() => {
-    let socket = new WebSocket(`ws://${process.env.NEXT_PUBLIC_BACKEND_API_PROD}`);
+    let socket = new WebSocket(`wss://${process.env.NEXT_PUBLIC_BACKEND_API_PROD}`);
     setUserId(localStorage.getItem("user") || "");
     setSocket(socket);
 
