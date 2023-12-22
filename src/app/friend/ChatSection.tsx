@@ -25,14 +25,16 @@ export default function ChatSections({ data }: { data: any }) {
 
   // console.log(user_id)
   useEffect(() => {
-    const socket = new WebSocket('wss://social-media-platform-4dt3.onrender.com');
-    setUserId(localStorage.getItem("user") || "");
+    const socket = new WebSocket(
+      "wss://social-media-platform-4dt3.onrender.com"
+    );
+    const user_id = parseInt(localStorage.getItem("user") as string);
     setSocket(socket);
 
     socket.onopen = () => {
       const data = {
         type: "connect",
-        user_id: userId,
+        user_id: user_id,
       };
 
       socket.send(JSON.stringify(data));
