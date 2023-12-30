@@ -62,14 +62,14 @@ export default function Following({
           ) : (
             <div className="flex justify-center items-center">
               <h1 className="text-2xl font-bold dark:text-gray-200">
-                Your friends haven't posted anything yet
+                Your friends haven&apos;t posted anything yet
               </h1>
             </div>
           )
         ) : (
           <div className="flex justify-center items-center">
             <h1 className="text-2xl font-bold dark:text-gray-200">
-              You haven't followed anyone yet
+                You haven&apos;t followed anyone yet
             </h1>
           </div>
         )}
