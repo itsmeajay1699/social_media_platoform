@@ -28,6 +28,11 @@ export default function LoginForm({ register, handleSubmit }: props) {
     try {
       const checkData = loginSchema.safeParse(data);
 
+      if (data.password.length < 8) {
+        toast.error("Password must be at least 8 characters");
+        return;
+      }
+
       if (!checkData.success) {
         toast.error("Invalid data");
         return;
@@ -47,6 +52,11 @@ export default function LoginForm({ register, handleSubmit }: props) {
 
       const response = await res.json();
 
+      if (response?.error) {
+        toast.error(response.message);
+        return;
+      }
+
       localStorage.setItem("token", response.token);
       localStorage.setItem("user", response.user.id);
 
@@ -54,10 +64,17 @@ export default function LoginForm({ register, handleSubmit }: props) {
         toast.error(response.message);
         return;
       }
+
+      // set the token in the cookie
+      document.cookie = `token=${response.token}; expires=${new Date(
+        Date.now() + 86400 * 1000
+      ).toUTCString()}; secure; samesite=strict; path=/`;
+
       toast.success("Sign in successfully");
       router.push("/dashboard");
     } catch (err) {
       // //(err);
+      console.log(err);
       toast.error("Sign in failed");
     }
   };
@@ -76,8 +93,6 @@ export default function LoginForm({ register, handleSubmit }: props) {
         <Input
           {...register("password", {
             required: true,
-            minLength: 8,
-            maxLength: 16,
           })}
           type="password"
           placeholder="Password"

@@ -4,31 +4,45 @@ import FriendsComponentCard from "../dashboard/components/FriendsComponents";
 import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
+import { CloudFog } from "lucide-react";
+import { set } from "zod";
 
 type USER = {
-  _id: string;
+  id: string;
   username: string;
   profile_photo: string;
 };
 
-export default function ChatSections({ data }: { data: any }) {
-  const [user, setUser] = useState<USER | null>(null);
+type Message = {
+  id: number;
+  sender_id: number;
+  chat_room_id: number;
+  content: string;
+  media: string;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string;
+  user_messages: USER;
+};
+
+export default function ChatSections({ data }: { data?: any }) {
+  const [chatRoom, setChatRoom] = useState<Number | String | null>(null);
+  const [currentSelectedUser, setCurrentSelectedUser] = useState<USER | null>(
+    null
+  );
   const [userId, setUserId] = useState<string | Number>("");
+  const [messages, setMessages] = useState<Message[] | []>([]);
   const [message, setMessage] = useState<string>("");
   const [socket, setSocket] = useState<any>(null);
-  const [myMessage, setMyMessage] = useState<any>([]);
-  const [receiverMessage, setReceiverMessage] = useState<any>([]);
-  // const fkk = localStorage.getItem("user") as string;
-  // const user_id = parseInt(localStorage.getItem("user") as string); showing error
-  //  because of the this client component is embedded in the server
-  // component so it is not able to get the localstorage value so use local sorage in the useEffect hook
 
-  // console.log(user_id)
+  const [allChatRooms, setAllChatRooms] = useState<any>([]);
+
   useEffect(() => {
     const socket = new WebSocket(
-      "wss://social-media-platform-4dt3.onrender.com"
+      `${process.env.NEXT_PUBLIC_WEBSOCKET_API_PROD}`
     );
     const user_id = parseInt(localStorage.getItem("user") as string);
+    setUserId(user_id);
     setSocket(socket);
 
     socket.onopen = () => {
@@ -42,9 +56,18 @@ export default function ChatSections({ data }: { data: any }) {
 
     socket.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      console.log(data.message);
       if (data.type === "message") {
-        setReceiverMessage((prev: any) => [...prev, data.message]);
+        setMessages((messages) => [...messages, data.message]);
+
+        setAllChatRooms((allChatRooms: any) => {
+          const newChatRoom = allChatRooms.filter(
+            (chatRoom: any) => chatRoom.id !== data?.newChatRoom?.id
+          );
+
+          return [...newChatRoom, data.newChatRoom];
+        });
+
+        // setRefresh((refresh) => !refresh);
       }
     };
 
@@ -59,46 +82,164 @@ export default function ChatSections({ data }: { data: any }) {
     };
   }, []);
 
-  const sendMessage = () => {
+  useEffect(() => {
+    const getAllChatRooms = async () => {
+      try {
+        // console.log("hello");
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_BACKEND_API_PROD}/api/v1/relation/all/chat_rooms`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+
+        if (res.status === 200) {
+          const data = await res.json();
+          if (data.error) {
+            // toast.error(data.message);
+          } else {
+            // toast.success(data.message);
+            return data;
+          }
+        }
+      } catch (err) {
+        //(err);
+      }
+    };
+    getAllChatRooms().then((data) => {
+      setAllChatRooms(data.chatRooms);
+    });
+  }, []);
+
+  useEffect(() => {
+    const allChatRoomMessages = async () => {
+      try {
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_BACKEND_API_PROD}/api/v1/chat/messages/${chatRoom}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+            cache: "no-store",
+          }
+        );
+
+        if (res.status === 200) {
+          const data = await res.json();
+          if (data.error) {
+            // toast.error(data.message);
+          } else {
+            // toast.success(data.message);
+            console.log(data.messages);
+            setMessages(data.messages);
+          }
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    allChatRoomMessages();
+  }, [chatRoom]);
+
+  const sendMessage = async () => {
     try {
       const data = {
         type: "message",
-        receiver: user?._id,
+        chatRoom: chatRoom,
         message: message,
         sender: userId,
       };
-      setMyMessage((prev: any) => [...prev, message]);
+
+      // socket.send(JSON.stringify(data));
+
+      const sendMessage = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_API_PROD}/api/v1/chat/send-message`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify(data),
+          cache: "no-store",
+        }
+      );
+
+      if (sendMessage.status === 200) {
+        const data = await sendMessage.json();
+        console.log(data);
+        if (data.error) {
+          console.log(data.message);
+        } else {
+          console.log(data);
+          setMessages([...messages, data.message]);
+          setAllChatRooms((allChatRooms: any) => {
+            const newChatRoom = allChatRooms.filter(
+              (chatRoom: any) => chatRoom.id !== data?.newChatRoom?.id
+            );
+
+            return [...newChatRoom, data.newChatRoom];
+          });
+        }
+      }
+
       setMessage("");
-      socket.send(JSON.stringify(data));
     } catch (err) {
       console.log(err);
     }
   };
 
-  // console.log(user);
+  useEffect(() => {
+    // make the scroll bar go to the bottom
+    const chatBox = document.getElementById("chatBox");
+    // console.log(chatBox?.scrollHeight);
+
+    chatBox?.scrollTo({
+      top: chatBox.scrollHeight,
+      behavior: "smooth",
+    });
+  }, [chatRoom]);
+
+  // console.log(messages);
+
+  // console.log(allChatRooms);
+  // console.log(userId)
 
   return (
     <>
-      <div className="max-w-[400px] w-full max-h-[800px] overflow-hidden overflow-y-auto">
-        <div className="bg-primary text-secondary rounded-md p-2">
-          <FriendsComponentCard setUser_id={setUser} data={data?.friends} />
+      {allChatRooms.length > 0 && (
+        <div className="max-w-[400px] w-full  flex-grow">
+          <div className="bg-primary text-secondary rounded-md p-2">
+            <FriendsComponentCard
+              userId={userId}
+              setUser_id={setChatRoom}
+              data={allChatRooms}
+              setCurrentSelectedUser={setCurrentSelectedUser}
+            />
+          </div>
         </div>
-      </div>
+      )}
       {
-        <div className="flex flex-col gap-2 w-full">
-          {user?._id ? (
+        <div className="flex flex-col gap-2 w-full flex-grow ">
+          {chatRoom ? (
             <>
-              <div className="w-full min-h-[710px] overflow-hidden overflow-y-auto relative pb-4">
+              <div className="w-full h-min-full  relative pb-4">
                 <div
-                  className="bg-primary text-secondary rounded-md p-2"
-                  style={{ height: "100%" }}
+                  className="bg-primary text-secondary rounded-md p-2 flex flex-col chat-section"
+                  // style={{ height: "100%" }}
                 >
                   <div className="bg-primary text-secondary rounded-md p-2">
                     <div className="flex justify-between items-center">
                       <div className="flex items-center gap-2">
                         <div className="w-10 h-10 rounded-full bg-secondary">
                           <Image
-                            src={user?.profile_photo}
+                            src={currentSelectedUser?.profile_photo!}
                             width={40}
                             height={40}
                             alt="avatar"
@@ -107,7 +248,7 @@ export default function ChatSections({ data }: { data: any }) {
                         </div>
                         <div className="flex flex-col">
                           <h1 className="text-lg font-bold">
-                            {user?.username}
+                            {currentSelectedUser?.username}
                           </h1>
                           <p className="text-sm">Active Now</p>
                         </div>
@@ -171,31 +312,110 @@ export default function ChatSections({ data }: { data: any }) {
                       </div>
                     </div>
                   </div>
-
-                  <div className="mt-2 p-4 h-[500px] overflow-hidden overflow-y-auto relative ">
-                    <div className="max-w-[50%]">
-                      {receiverMessage.map((msg: any) => (
-                        <p
-                          key={msg}
-                          className="bg-secondary text-primary rounded-md p-2 mb-2 w-[fit-content]"
-                        >
-                          {msg}
-                        </p>
-                      ))}
-                    </div>
-
-                    <div className="max-w-[50%] text-right absolute right-0 ">
-                      {myMessage.map((msg: any) => (
-                        <div
-                          key={msg}
-                          className="max-w-[100%] flex justify-end mb-2"
-                        >
-                          <p className="bg-secondary text-primary rounded-md p-2">
-                            {msg}
-                          </p>
-                        </div>
-                      ))}
-                    </div>
+                  {/* chat box here */}
+                  {/* give this to the full avaible height */}
+                  <div
+                    id="chatBox"
+                    className="mt-2 p-4 pb-[3rem]
+                    flex-grow
+                    overflow-hidden overflow-y-auto relative  "
+                  >
+                    {messages.length > 0 ? (
+                      messages?.map((message) => {
+                        return (
+                          <div
+                            key={message.id}
+                            className={`flex flex-col gap-2 ${
+                              message.sender_id === userId
+                                ? "items-end"
+                                : "items-start"
+                            }`}
+                          >
+                            <div
+                              className={`flex flex-col gap-2 w-full ${
+                                message?.sender_id === userId
+                                  ? "items-end"
+                                  : "items-start"
+                              }`}
+                            >
+                              <div
+                                className={`md:w-1/2 w-full mb-4 border rounded-md p-2 ${
+                                  message?.sender_id === userId
+                                    ? "items-end"
+                                    : "items-start"
+                                }`}
+                              >
+                                <div className="flex gap-2 relative">
+                                  <div
+                                    className={`w-10 h-10 rounded-full ${
+                                      message.sender_id === userId
+                                        ? "bg-secondary"
+                                        : "bg-primary"
+                                    }`}
+                                  >
+                                    <Image
+                                      src={
+                                        message?.user_messages?.profile_photo
+                                      }
+                                      width={40}
+                                      height={40}
+                                      alt="avatar"
+                                      className="rounded-full h-[40px] w-[40px]"
+                                    />
+                                  </div>
+                                  <div
+                                    className={`flex flex-col flex-1 relative`}
+                                  >
+                                    <p
+                                      className={`text-sm ${
+                                        message?.sender_id === userId
+                                          ? "text-secondary"
+                                          : "text-secondary"
+                                      }`}
+                                    >
+                                      {message?.user_messages?.username}
+                                    </p>
+                                    <div
+                                      className={`flex items-center gap-2 ${
+                                        message?.sender_id === userId
+                                          ? "items-end"
+                                          : "text-secondary"
+                                      }`}
+                                    >
+                                      <p
+                                        className={`text-sm ${
+                                          message?.sender_id === userId
+                                            ? "text-secondary"
+                                            : "text-secondary"
+                                        }`}
+                                      >
+                                        {message?.content}
+                                      </p>
+                                      <p
+                                        className={`text-xs absolute right-0 top-[5px] ${
+                                          message?.sender_id === userId
+                                            ? "text-secondary"
+                                            : "text-secondary"
+                                        }`}
+                                      >
+                                        {message?.createdAt}
+                                      </p>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })
+                    ) : (
+                      <div className="flex justify-center items-center">
+                        <h1 className="text-2xl">
+                          Start a conversation with{" "}
+                          {currentSelectedUser?.username}
+                        </h1>
+                      </div>
+                    )}
                   </div>
                 </div>
                 <form
@@ -230,22 +450,6 @@ export default function ChatSections({ data }: { data: any }) {
                       />
                     </svg>
                   </Button>
-
-                  {/* <svg
-                    onClick={sendMessage}
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="white"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
-                    className="h-10 w-10 text-black cursor-pointer"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"
-                    />
-                  </svg> */}
                 </form>
               </div>
             </>

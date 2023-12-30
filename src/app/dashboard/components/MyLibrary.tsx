@@ -7,7 +7,7 @@ const myPost = async () => {
   try {
     if (!cookies()?.get("token")?.value) return new Error("Unauthorized");
     const token = cookies()?.get("token")?.value;
-    console.log(token)
+    console.log(token);
     const res = Api(
       `${process.env.NEXT_PUBLIC_BACKEND_API_PROD}/api/v1/post/my-post`,
       token as string,
@@ -29,7 +29,7 @@ export default async function MyLibrary() {
 
   return (
     <section>
-      <div>
+      <div className="flex items-center justify-center">
         <UploadPostComponent />
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 ">

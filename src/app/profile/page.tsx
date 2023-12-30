@@ -93,6 +93,7 @@ export default function ProfilePage() {
 
   async function onSubmit(data: ProfileFormValues) {
     try {
+      const checkPhoto = "https://i.imgur.com/6VBx3io.png";
       setLoading(true);
       delete data.profile_photo; // remove the profile_photo from the data
       const token = localStorage.getItem("token");
@@ -100,43 +101,58 @@ export default function ProfilePage() {
       if (file) {
         resEdgeStore = await edgestore.publicFiles.upload({
           file,
-          options: {
-            temporary: true,
-          },
+          // options: {
+          //   temporary: true,
+          // },
         });
         data.profile_photo = resEdgeStore.url;
-        const checkPhoto = "https://i.imgur.com/6VBx3io.png";
-        if (user.profile_photo !== checkPhoto) {
+      }
+
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_API_PROD}/api/v1/user/update`,
+        {
+          method: "PATCH",
+          body: JSON.stringify(data),
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (res.status !== 200) {
+        if (resEdgeStore?.url) {
           const deletePhoto = await edgestore.publicFiles.delete({
-            url: user.profile_photo,
+            url: resEdgeStore.url,
           });
+
+          throw new Error("network error");
         }
       }
 
-      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_PROD}/api/v1/user/update`, {
-        method: "PATCH",
-        body: JSON.stringify(data),
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      if (user.profile_photo !== checkPhoto && user.profile_photo && file) {
+        const deletePhoto = await edgestore.publicFiles.delete({
+          url: user.profile_photo,
+        });
+      }
+
       const response = await res.json();
 
       if (response.error) {
         return toast.error(response.message);
       }
 
-      if (response && file) {
-        // console.log(resEdgeStore.url);
-        const confirm = await edgestore.publicFiles.confirmUpload({
-          url: resEdgeStore.url,
-        });
+      if (resEdgeStore?.url) {
+        // const confirm = await edgestore.publicFiles.confirmUpload({
+        //   url: resEdgeStore.url,
+        // });
+        console.log(confirm);
       }
 
       toast.success("Profile updated successfully");
       setRefresh(!refresh);
     } catch (err) {
+      console.log(err);
       toast.error("Something went wrong");
       //(err);
     } finally {

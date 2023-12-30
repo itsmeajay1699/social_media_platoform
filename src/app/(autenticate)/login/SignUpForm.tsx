@@ -16,14 +16,27 @@ export default function SignUpForm({ register, handleSubmit }: props) {
   const router = useRouter();
   const onSubmit = async (data: SignUpValues) => {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_PROD}/api/v1/auth/register`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-        credentials: "include",
-      });
+      if (data.password.length < 8) {
+        toast.error("Password must be at least 8 characters");
+        return;
+      }
+
+      if (data.password !== data.confirmPassword) {
+        toast.error("Password does not match");
+        return;
+      }
+
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_API_PROD}/api/v1/auth/register`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+          credentials: "include",
+        }
+      );
 
       const resData = await res.json();
       localStorage.setItem("token", resData.token);
@@ -67,8 +80,6 @@ export default function SignUpForm({ register, handleSubmit }: props) {
         <Input
           {...register("password", {
             required: true,
-            minLength: 8,
-            maxLength: 16,
           })}
           type="password"
           placeholder="Password"
@@ -77,8 +88,6 @@ export default function SignUpForm({ register, handleSubmit }: props) {
         <Input
           {...register("confirmPassword", {
             required: true,
-            minLength: 8,
-            maxLength: 16,
           })}
           type="password"
           placeholder="Confirm Password"
