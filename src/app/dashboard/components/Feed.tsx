@@ -14,9 +14,9 @@ export default function Feed({
   return (
     <section>
       <div
-        style={{
-          display: "table",
-        }}
+        // style={{
+        //   display: "table",
+        // }}
         className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 w-full"
       >
         {data?.allPublicPost?.length > 0 ? (
