@@ -49,6 +49,9 @@ export default function SignUpForm({ register, handleSubmit }: props) {
       if (resData?.token) {
         localStorage.setItem("token", resData.token);
         localStorage.setItem("user", resData.user.id);
+        document.cookie = `token=${resData.token}; expires=${new Date(
+          Date.now() + 86400 * 1000
+        ).toUTCString()}; secure; samesite=strict; path=/`;
       }
 
       toast.success("Sign up successfully");
