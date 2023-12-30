@@ -38,6 +38,7 @@ export default function ChatSections({ data }: { data?: any }) {
   const [allChatRooms, setAllChatRooms] = useState<any>([]);
 
   useEffect(() => {
+    console.log(process.env.NEXT_PUBLIC_WEBSOCKET_API_PROD)
     const socket = new WebSocket(
       `${process.env.NEXT_PUBLIC_WEBSOCKET_API_PROD}`
     );

@@ -13,19 +13,27 @@ export default function Sidebar() {
   const router = useRouter();
   const logout = async () => {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_PROD}/api/v1/auth/logout`, {
-        credentials: "include",
-      });
-      if (res.status === 404) return null;
+      // const res = await fetch(
+      //   `${process.env.NEXT_PUBLIC_BACKEND_API_PROD}/api/v1/auth/logout`,
+      //   {
+      //     credentials: "include",
+      //   }
+      // );
+      // if (res.status === 404) return null;
       localStorage.removeItem("token");
-      const data = await res.json();
+      document.cookie =
+        "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+
+      // const data = await res.json();
       //(data);
-      if (data instanceof Error) {
-      } else {
-        // revalidatePath("/dashboard");
-        // redirect("/dashboard");
-        router.replace("/login");
-      }
+      // if (data instanceof Error) {
+      // } else {
+      //   // revalidatePath("/dashboard");
+      //   // redirect("/dashboard");
+      //   router.replace("/login");
+      // }
+
+      router.replace("/login");
     } catch (err) {
       //(err);
       return null;
