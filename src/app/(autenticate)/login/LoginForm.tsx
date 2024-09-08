@@ -11,6 +11,7 @@ import { redirect } from "next/navigation";
 import React from "react";
 
 import { useRouter } from "next/navigation";
+import { Eye, EyeOff } from "lucide-react";
 
 type props = {
   register: UseFormRegister<LoginValues>;
@@ -26,6 +27,7 @@ const loginSchema = z.object({
 export default function LoginForm({ register, handleSubmit }: props) {
   const router = useRouter();
   const [loading, setLoading] = React.useState(false);
+  const [showPassword, setShowPassword] = React.useState(false);
   const onSubmit = async (data: LoginValues) => {
     try {
       setLoading(true);
@@ -95,14 +97,26 @@ export default function LoginForm({ register, handleSubmit }: props) {
             required: true,
           })}
         />
-        <Input
-          {...register("password", {
-            required: true,
-          })}
-          type="password"
-          placeholder="Password"
-          className="mt-4 bg-[#EAF0F7] py-6 text-black"
-        />
+        <div className="relative w-full border-none">
+          <Input
+            {...register("password", {
+              required: true,
+            })}
+            type={showPassword ? "text" : "password"}
+            placeholder="Password"
+            className="mt-4 bg-[#EAF0F7] py-6 text-black"
+          />
+          <div
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute top-3 right-2 w-[25px] h-[25px] cursor-pointer"
+          >
+            {showPassword ? (
+              <EyeOff className="h-full w-full text-black" />
+            ) : (
+              <Eye className="text-black h-full w-full" />
+            )}
+          </div>
+        </div>
         <h6 className="text-right mt-4">Recover password ?</h6>
         {!loading ? (
           <Button type="submit" className="mt-4 w-full py-6">
@@ -139,7 +153,7 @@ export default function LoginForm({ register, handleSubmit }: props) {
           <div className="flex-grow border-t border-black"></div>
         </div>
       </form>
-      <div className="text-center flex gap-4 justify-center">
+      {/* <div className="text-center flex gap-4 justify-center">
         <Button className="bg-white">
           <Image src={images.google} width={20} height={20} alt="google" />
         </Button>
@@ -149,7 +163,7 @@ export default function LoginForm({ register, handleSubmit }: props) {
         <Button className="bg-white">
           <Image src={images.fb} width={20} height={20} alt="google" />
         </Button>
-      </div>
+      </div> */}
     </section>
   );
 }

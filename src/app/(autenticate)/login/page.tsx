@@ -29,8 +29,20 @@ export type SignUpValues = z.infer<typeof signUpSchema>;
 export default function SignUpPage() {
   const [pageState, setPageState] = React.useState<PageState>("Login");
 
-  const loginForm = useForm<LoginValues>();
-  const signUpForm = useForm<SignUpValues>();
+  const loginForm = useForm<LoginValues>({
+    defaultValues: {
+      email: "ajay@gmail.com",
+      password: "12345678",
+    },
+  });
+  const signUpForm = useForm<SignUpValues>({
+    defaultValues: {
+      email: "demo@gmail.com",
+      password: "demo@1234",
+      username: "demoAccount",
+      confirmPassword: "demo@1234",
+    },
+  });
 
   const {
     register: loginRegister,
@@ -38,10 +50,8 @@ export default function SignUpPage() {
     reset,
   } = loginForm;
 
-  const {
-    register: signUpRegister,
-    handleSubmit: signUpHandleSubmit,
-  } = signUpForm;
+  const { register: signUpRegister, handleSubmit: signUpHandleSubmit } =
+    signUpForm;
 
   return (
     <main className="bg-login_bg">
